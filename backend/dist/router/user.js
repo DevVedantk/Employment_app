@@ -26,6 +26,7 @@ const CLIENT_SECRETE = process.env.CLIENT_SECRETE;
 const sendemail = require("../otplogic/otp");
 const otp_generator_1 = __importDefault(require("otp-generator"));
 //
+const systemPrompt_1 = __importDefault(require("../systemPrompt"));
 const multer = require('multer');
 const { createClient } = require('@deepgram/sdk');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
@@ -437,8 +438,11 @@ exports.userRouter.post('/api/voice', upload.single('audio'), (req, res) => __aw
         if (error)
             throw error;
         const userText = result.results.channels[0].alternatives[0].transcript;
-        const content = [{ text: userText }]; //Gemini    Integration
-        const response = yield model.generateContent(content);
+        const fullContent = [
+            { role: 'user', parts: [{ text: systemPrompt_1.default }] }, //Gemini    Integration
+            { role: 'user', parts: [{ text: userText }] }
+        ];
+        const response = yield model.generateContent({ contents: fullContent });
         const botReply = response.response.text();
         const ttsResponse = yield deepgram.speak.request(//(TTS)    Integration
         { text: botReply }, { model: 'aura-asteria-en' });

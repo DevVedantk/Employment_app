@@ -15,6 +15,8 @@ import axios from 'axios';
 
 
 //
+import systemPrompt from '../systemPrompt';
+
 const multer  = require('multer');
 const { createClient } = require('@deepgram/sdk');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
@@ -521,8 +523,7 @@ userRouter.get("/placesdata",async(req,res)=>{
 //
 userRouter.post('/api/voice', upload.single('audio'), async (req, res) => {
     try {
-      
-      const { buffer: audioBuffer, mimetype } = (req as any).file;                    //(STT) Integration
+      const { buffer: audioBuffer, mimetype } = (req as any).file;                //(STT) Integration
 
       const { result, error } = await deepgram.listen.prerecorded.transcribeFile(
         audioBuffer,
@@ -536,8 +537,13 @@ userRouter.post('/api/voice', upload.single('audio'), async (req, res) => {
       if (error) throw error;
       const userText = result.results.channels[0].alternatives[0].transcript;
       
-      const content = [{ text: userText }];                                       //Gemini    Integration
-      const response = await model.generateContent(content);
+      const fullContent = [
+        { role: 'user', parts: [{ text: systemPrompt }] },                        //Gemini    Integration
+        { role: 'user', parts: [{ text: userText }] }
+      ];
+              
+      const response = await model.generateContent({ contents: fullContent });
+      
       const botReply = response.response.text();
       
       const ttsResponse = await deepgram.speak.request(                           //(TTS)    Integration

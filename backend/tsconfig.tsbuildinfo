@@ -1,1 +1,1 @@
-{"root":["./src/index.ts","./src/otplogic/otp.ts","./src/router/user.ts"],"version":"5.8.2"}
+{"root":["./src/index.ts","./src/systemprompt.ts","./src/otplogic/otp.ts","./src/router/user.ts"],"version":"5.8.2"}
