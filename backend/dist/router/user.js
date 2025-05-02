@@ -457,3 +457,63 @@ exports.userRouter.post('/api/voice', upload.single('audio'), (req, res) => __aw
     }
 }));
 //
+exports.userRouter.post("/createPost", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { name, title, Description, Amount, Mobile } = req.body;
+    const resp = yield pclient.fundingPost.create({
+        data: {
+            name: title,
+            Description: Description,
+            Goal: Amount,
+            Raised: "0",
+        }
+    });
+    console.log(resp);
+    res.json({
+        message: resp
+    });
+}));
+exports.userRouter.post("/uploadDoc", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("here l");
+    const { PostId, thumnailUrl, QRCodeUrl, ValidProofUrl, UPIid } = req.body;
+    console.log(PostId);
+    console.log(thumnailUrl);
+    console.log(QRCodeUrl);
+    console.log(UPIid);
+    const resp = yield pclient.fundingPost.update({
+        where: {
+            id: PostId.id
+        },
+        data: {
+            UPIid: UPIid,
+            Documents: ValidProofUrl,
+            img: thumnailUrl,
+            QRCode: QRCodeUrl
+        }
+    });
+    console.log(resp);
+    res.json({
+        message: resp
+    });
+}));
+exports.userRouter.get("/allpost", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const resp = yield pclient.fundingPost.findMany({});
+    res.json({
+        data: resp
+    });
+}));
+exports.userRouter.post("/verifyPayment", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("payemnt verify");
+    const { PostId, userId, Amount, ScreenShot } = req.body;
+    const resp = yield pclient.fundingPost.update({
+        where: {
+            id: PostId
+        },
+        data: {
+            Raised: Amount
+        }
+    });
+    console.log(resp);
+    res.json({
+        message: resp
+    });
+}));

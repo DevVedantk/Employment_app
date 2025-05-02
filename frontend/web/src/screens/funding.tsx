@@ -1,9 +1,23 @@
+import { useEffect, useState } from "react"
 import { Footer } from "../components/footer"
 import { FundingCard } from "../components/fundcard"
 import { HeroSec } from "../components/Fundherosection"
 import { Navbar } from "../components/navbar"
+import axios from "axios"
 
 export const RaiseFund = () => {
+    const [posts,setposts]=useState([]);
+
+
+    useEffect(()=>{
+        axios.get("http://localhost:3000/user/allpost",{withCredentials:true}).then((resp)=>{
+            // console.log(resp);
+            setposts(resp.data.data)
+        })
+    },[])
+
+
+    console.log("posts",posts);
 
     return <div className="h-screen w-full overflow-x-hidden">
         <Navbar />
@@ -44,13 +58,12 @@ export const RaiseFund = () => {
                   </div>
 
                   <div className="w-full flex gap-10 flex-wrap p-10 items-center ml-24">
-                     <FundingCard/>
-                     <FundingCard/>
-                     <FundingCard/>
-                     <FundingCard/>
-                     <FundingCard/>
-                     <FundingCard/>
-                     <FundingCard/>
+                    {
+                        posts.map((items)=>
+                            <FundingCard data={items}/>
+                        )
+                    }
+                    
                   </div>
 
                   <Footer/>

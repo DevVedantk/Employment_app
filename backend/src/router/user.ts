@@ -2,7 +2,7 @@ import express, { json, Router } from 'express';
 import { PrismaClient } from '@prisma/client';
 const pclient=new PrismaClient();
 export const userRouter=Router();
-import z, { string } from 'zod';
+import z, { number, string } from 'zod';
 import bcrypt, { hash } from 'bcrypt';
 import jwt from 'jsonwebtoken';
 const JWT_KEY=process.env.JWT_KEY as string;
@@ -562,3 +562,92 @@ userRouter.post('/api/voice', upload.single('audio'), async (req, res) => {
     }
   });
 //
+
+
+userRouter.post("/createPost",async(req,res)=>{
+     
+    const {name,title,Description,Amount,Mobile}=req.body;
+
+     
+   const resp=await pclient.fundingPost.create({
+        data:{
+        name:title,
+        Description:Description,
+        Goal:Amount,
+        Raised:"0",
+        }
+    })
+
+    console.log(resp)
+    res.json({
+        message:resp
+    })
+
+})
+
+
+userRouter.post("/uploadDoc",async(req,res)=>{
+
+    console.log("here l");
+   
+    const {PostId,thumnailUrl,QRCodeUrl,ValidProofUrl,UPIid}=req.body;
+        
+    console.log(PostId);
+    console.log(thumnailUrl);
+    console.log(QRCodeUrl);
+
+    console.log(UPIid);
+
+
+
+    const resp=await pclient.fundingPost.update({
+      where:{
+        id:PostId.id
+      },
+      data:{
+       UPIid:UPIid,
+       Documents:ValidProofUrl,
+       img:thumnailUrl,
+       QRCode:QRCodeUrl
+      }
+    })
+
+
+    console.log(resp);
+
+    res.json({
+        message:resp
+    })
+
+})
+
+userRouter.get("/allpost",async(req,res)=>{
+    
+   const resp=await pclient.fundingPost.findMany({});
+
+  res.json({
+  data:resp
+ })
+})
+
+
+userRouter.post("/verifyPayment",async(req,res)=>{
+    console.log("payemnt verify")
+    const {PostId,userId,Amount,ScreenShot}=req.body;
+
+    const resp=await pclient.fundingPost.update({
+        where:{
+        id:PostId
+        }
+        ,
+        data:{
+         Raised:Amount
+        }
+    })
+
+    console.log(resp);
+
+    res.json({
+        message:resp
+    })
+})

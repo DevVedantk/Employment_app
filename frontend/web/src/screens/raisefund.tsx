@@ -14,6 +14,36 @@ export const RaiseFundPost=()=>{
 
     const navigate=useNavigate();
 
+     const HandleSubmit=async()=>{
+        if(titleRef.current?.value==="" || MobileRef.current?.value==="" || NameRef.current?.value==="" || DescriptionRef.current?.value==="" ||
+            AmountRef.current?.value===""
+        ){
+            alert("Please Enter Valid Details Only");
+            return;
+        } else{
+
+        
+
+
+      const resp=await axios.post("http://localhost:3000/user/createPost",{
+            name:NameRef.current?.value,
+            Mobile:MobileRef.current?.value,
+            title:titleRef.current?.value,
+            Description:DescriptionRef.current?.value,
+            Amount:AmountRef.current?.value
+        },{withCredentials:true})
+
+        console.log(resp);
+
+        if(resp.data){
+            navigate("/upload-documents",{
+                state:{id:resp.data.message.id}
+            });
+        }
+
+    }
+     }
+
 
     return <div className="h-screen w-full">
           
@@ -43,7 +73,7 @@ export const RaiseFundPost=()=>{
                     <FormField inputref={AmountRef} title="Amount to Raise" placeholder="Enter Amount" type="text"/>
 
                     <div className="w-1/2">
-                    <button onClick={()=>navigate("/upload-documents")} className="border-1 bg-[#D6F34B]  cursor-pointer border-white px-20 py-4 rounded-full font-medium flex items-center gap-2">Proceed</button>
+                    <button onClick={HandleSubmit} className="border-1 bg-[#D6F34B]  cursor-pointer border-white px-20 py-4 rounded-full font-medium flex items-center gap-2">Proceed</button>
                     </div>
                 </div>
                </div>

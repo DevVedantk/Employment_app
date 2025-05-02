@@ -1,8 +1,73 @@
 import { Calendar, User } from "lucide-react"
 import { Navbar } from "../components/navbar"
 import { Donate } from "../svg/donate"
+import { useLocation } from "react-router-dom"
+import { UploadField } from "../components/uploadinputfield"
+import { useEffect, useRef, useState } from "react"
+import { FormField } from "../components/formfeild"
+import axios from "axios"
 
 export const DetailPost = () => {
+
+  const data=useLocation().state.postdata;
+  const ScreenShotQR=useRef<HTMLInputElement>(null);
+  const AmountRef=useRef<HTMLInputElement>(null);
+
+
+  console.log("thi is my data",data)
+  const [img,setimg]=useState("");
+
+
+  const [auth,setauths]=useState(false);
+  const [userId,setUserId]=useState("");
+
+  useEffect(()=>{
+    axios.get("http://localhost:3000/user/auths",{withCredentials:true}).then((resp)=>{
+      console.log("check auths :",resp);
+      if(resp.data.message==="authenticated"){
+          setauths(true);
+          setUserId(resp.data.userData.id);
+      }
+    })
+  },[])
+
+  console.log("user id is",userId);
+
+  const getScreenshotURL=async(event:any)=>{
+
+    const file=event.target.files[0];
+    console.log("my images",file)
+    // console.log(imgRef.current.value)
+    if(!file) return;
+
+    const data=new FormData();
+    data.append("file",file);
+    data.append("upload_preset","employapp");
+    data.append("cloud_name","dnlqcnhoy");
+    const resp=await axios.post("https://api.cloudinary.com/v1_1/dnlqcnhoy/image/upload",data);
+   
+    // console.log("from cludinary response : ",resp.data.url);
+    setimg(resp.data.url)
+  }
+
+
+  const handleQRScreenShotUpload=async()=>{
+               
+  const resp=await axios.post("http://localhost:3000/user/verifyPayment",{
+          PostId:data.id,
+          Amount:AmountRef.current?.value,
+          ScreenShot:img,
+          userId:userId
+    },{withCredentials:true})
+
+
+    alert("Successfully Submitted");
+    window.location.reload();
+    console.log(resp);
+  }
+
+
+
   return (
     <div className="min-h-screen flex flex-col w-full">
       <Navbar />
@@ -11,22 +76,22 @@ export const DetailPost = () => {
       <div className="flex w-full flex-1">
         {/* Left side */}
         <div className="w-2/3 flex flex-col p-4">
-          <div className="mt-16 w-full h-16 flex items-center justify-center rounded">
-            <h1 className="text-3xl font-semibold">Medical Emergency: Need urgent Help</h1>
+          <div className="mt-16 w-full h-16 flex ml-30 p-4 rounded">
+            <h1 className="text-3xl font-semibold">{data.name}</h1>
           </div>
           <div className="w-full flex items-center justify-center">
-            <img className="cover rounded-xl h-80 w-[600px]" src="https://static.vecteezy.com/system/resources/thumbnails/039/030/117/small/ai-generated-sick-male-patient-sleeps-on-the-bed-in-the-hospital-a-man-in-a-hospital-bed-appearing-to-be-asleep-with-an-iv-drip-stand-next-to-the-bed-photo.jpg" alt="" />
+            <img className="cover rounded-xl h-80 w-[600px]" src={data.img} alt="" />
           </div>
 
 
           <div className="w-6/8  p-2 ml-18">
                
           <div className="flex ml-16 justify-between">
-                 <h1 className="ml-2 text-xl">Raised: Rs.3000</h1>
-                 <h1 className="mr-8 text-xl">10%</h1>
+                 <h1 className="ml-2 text-xl">Raised: Rs.{data.Raised}</h1>
+                 <h1 className="mr-8 text-xl">{Number((Number(data.Raised)/Number(data.Goal))*100)}%</h1>
               </div>
               <div className="ml-16 flex text-md justify-between">
-              <h1 className="ml-2 text-xl">Goal: Rs.13000</h1>
+              <h1 className="ml-2 text-xl">Goal: Rs.{data.Goal}</h1>
               <h1 className="mr-8 text-xl flex"> <h1 className="mr-1 h-2"> <Calendar/></h1> 45 days left</h1>
               </div>
           </div>
@@ -39,7 +104,7 @@ export const DetailPost = () => {
 
           <div className="w-[600px] ml-32">
             <h1 className=" text-xl mt-2">Description</h1>
-          <p className="text-gray-600  text-md mb-4 ml-2 mr-2">Lorem ipsum dolor sit amet consectetur adipisicing elit. Vero iusto veniam obcaecati cumque nulla nesciunt nostrum eveniet, rerum ratione repellendus.</p>
+          <p className="text-gray-600  text-md mb-4 ml-2 mr-2">{data.Description}</p>
           </div>
         </div>
 
@@ -63,7 +128,7 @@ export const DetailPost = () => {
 
              <div className="w-full h-24 p-4 ml-4">
                <h1 className="text-xl">Raised</h1>
-               <h1 className="text-xl">Rs.3000 of Rs.13,000</h1>
+               <h1 className="text-xl">Rs.{data.Raised} of Rs.{data.Goal}</h1>
              </div>
 
 
@@ -72,7 +137,7 @@ export const DetailPost = () => {
              </div>
 
              <div className="w-full flex items-center flex-col justify-center">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSS1GUPLH_5eU_Lx5W4cYuye3vc_rdlEObN3_JdyGeQ3doFxzRSu1mv56LleETrpPhYp6E&usqp=CAU" alt="" />
+                <img src={data.QRCode} alt="" />
           <p>Scan & donate with any app</p>
 
           <div className="flex items-center p-4">
@@ -82,6 +147,18 @@ export const DetailPost = () => {
           </div>
              </div>
 
+
+             <div className="w-full p-4 justify-center font-normal text-center flex flex-col items-center">
+             <h1 className="font-normal p-1">Upload Payment ScreenShot and specify Amount for Proof</h1>
+      <label htmlFor="vedant"
+        className="block rounded-xl border-1 cursor-pointer h-10 w-1/3 flex items-center justify-center text-sm font-medium text-gray-900"
+      >
+        Choose file
+      </label>
+      <input id="vedant" onChange={getScreenshotURL} className="hidden" ref={ScreenShotQR} type="file"/>
+       <input ref={AmountRef} className="h-10 w-2/3 border-1 mt-2 rounded-xl p-2" type="text" placeholder="Amount" />
+                            <button onClick={handleQRScreenShotUpload} className="h-12 p-2 mt-4  w-2/3 cursor-pointer rounded-3xl font-bold text-white bg-green-400">Submit</button>
+             </div>
            </div>
         </div>
       </div>

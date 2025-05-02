@@ -19,6 +19,7 @@
     "axios": "^1.8.2",
     "framer-motion": "^12.6.3",
     "google-map-react": "^2.2.1",
+    "lucide-react": "^0.503.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-google-maps": "^9.4.5",

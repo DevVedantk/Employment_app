@@ -46,5 +46,7 @@ model FundingPost{
   Goal String?
   img String?
   Documents String?
+  QRCode String?
+   UPIid String?
   DonorList users[]  @relation("donation")
 }
