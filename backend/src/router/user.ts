@@ -14,19 +14,19 @@ import otpgenerator from 'otp-generator';
 import axios from 'axios';
 
 
-//
-import systemPrompt from '../systemPrompt';
+// //
+// import systemPrompt from '../systemPrompt';
 
-const multer  = require('multer');
-const { createClient } = require('@deepgram/sdk');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
-const { Readable } = require('stream');
+// const multer  = require('multer');
+// const { createClient } = require('@deepgram/sdk');
+// const { GoogleGenerativeAI } = require('@google/generative-ai');
+// const { Readable } = require('stream');
 
-const upload = multer();
-const deepgram = createClient(process.env.DEEPGRAM_API_KEY);
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-//
+// const upload = multer();
+// const deepgram = createClient(process.env.DEEPGRAM_API_KEY);
+// const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+// const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+// //
 
 
 userRouter.post("/signup",async(req,res)=>{
@@ -520,48 +520,48 @@ userRouter.get("/placesdata",async(req,res)=>{
 })
 
 
-//
-userRouter.post('/api/voice', upload.single('audio'), async (req, res) => {
-    try {
-      const { buffer: audioBuffer, mimetype } = (req as any).file;                //(STT) Integration
+// //
+// userRouter.post('/api/voice', upload.single('audio'), async (req, res) => {
+//     try {
+//       const { buffer: audioBuffer, mimetype } = (req as any).file;                //(STT) Integration
 
-      const { result, error } = await deepgram.listen.prerecorded.transcribeFile(
-        audioBuffer,
-        {
-          model: 'nova-3',
-          language: 'en',
-          smart_format: true,
-        }
-      );
+//       const { result, error } = await deepgram.listen.prerecorded.transcribeFile(
+//         audioBuffer,
+//         {
+//           model: 'nova-3',
+//           language: 'en',
+//           smart_format: true,
+//         }
+//       );
 
-      if (error) throw error;
-      const userText = result.results.channels[0].alternatives[0].transcript;
+//       if (error) throw error;
+//       const userText = result.results.channels[0].alternatives[0].transcript;
       
-      const fullContent = [
-        { role: 'user', parts: [{ text: systemPrompt }] },                        //Gemini    Integration
-        { role: 'user', parts: [{ text: userText }] }
-      ];
+//       const fullContent = [
+//         { role: 'user', parts: [{ text: systemPrompt }] },                        //Gemini    Integration
+//         { role: 'user', parts: [{ text: userText }] }
+//       ];
               
-      const response = await model.generateContent({ contents: fullContent });
+//       const response = await model.generateContent({ contents: fullContent });
       
-      const botReply = response.response.text();
+//       const botReply = response.response.text();
       
-      const ttsResponse = await deepgram.speak.request(                           //(TTS)    Integration
-        { text: botReply },
-        { model: 'aura-asteria-en' }
-      );
+//       const ttsResponse = await deepgram.speak.request(                           //(TTS)    Integration
+//         { text: botReply },
+//         { model: 'aura-asteria-en' }
+//       );
       
-      // Stream TTS audio back to client
-      res.set('Content-Type', 'audio/mpeg');
-      const stream = await ttsResponse.getStream();
-      Readable.from(stream).pipe(res);
+//       // Stream TTS audio back to client
+//       res.set('Content-Type', 'audio/mpeg');
+//       const stream = await ttsResponse.getStream();
+//       Readable.from(stream).pipe(res);
   
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Internal Server Error' });
-    }
-  });
-//
+//     } catch (err) {
+//       console.error(err);
+//       res.status(500).json({ error: 'Internal Server Error' });
+//     }
+//   });
+// //
 
 
 userRouter.post("/createPost",async(req,res)=>{

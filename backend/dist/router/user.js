@@ -25,17 +25,17 @@ const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRETE = process.env.CLIENT_SECRETE;
 const sendemail = require("../otplogic/otp");
 const otp_generator_1 = __importDefault(require("otp-generator"));
-//
-const systemPrompt_1 = __importDefault(require("../systemPrompt"));
-const multer = require('multer');
-const { createClient } = require('@deepgram/sdk');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
-const { Readable } = require('stream');
-const upload = multer();
-const deepgram = createClient(process.env.DEEPGRAM_API_KEY);
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-//
+// //
+// import systemPrompt from '../systemPrompt';
+// const multer  = require('multer');
+// const { createClient } = require('@deepgram/sdk');
+// const { GoogleGenerativeAI } = require('@google/generative-ai');
+// const { Readable } = require('stream');
+// const upload = multer();
+// const deepgram = createClient(process.env.DEEPGRAM_API_KEY);
+// const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+// const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+// //
 exports.userRouter.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("reached!!");
     // console.log(JWT_KEY);
@@ -426,37 +426,40 @@ exports.userRouter.get("/placesdata", (req, res) => __awaiter(void 0, void 0, vo
         placesData
     });
 }));
-//
-exports.userRouter.post('/api/voice', upload.single('audio'), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { buffer: audioBuffer, mimetype } = req.file; //(STT) Integration
-        const { result, error } = yield deepgram.listen.prerecorded.transcribeFile(audioBuffer, {
-            model: 'nova-3',
-            language: 'en',
-            smart_format: true,
-        });
-        if (error)
-            throw error;
-        const userText = result.results.channels[0].alternatives[0].transcript;
-        const fullContent = [
-            { role: 'user', parts: [{ text: systemPrompt_1.default }] }, //Gemini    Integration
-            { role: 'user', parts: [{ text: userText }] }
-        ];
-        const response = yield model.generateContent({ contents: fullContent });
-        const botReply = response.response.text();
-        const ttsResponse = yield deepgram.speak.request(//(TTS)    Integration
-        { text: botReply }, { model: 'aura-asteria-en' });
-        // Stream TTS audio back to client
-        res.set('Content-Type', 'audio/mpeg');
-        const stream = yield ttsResponse.getStream();
-        Readable.from(stream).pipe(res);
-    }
-    catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-}));
-//
+// //
+// userRouter.post('/api/voice', upload.single('audio'), async (req, res) => {
+//     try {
+//       const { buffer: audioBuffer, mimetype } = (req as any).file;                //(STT) Integration
+//       const { result, error } = await deepgram.listen.prerecorded.transcribeFile(
+//         audioBuffer,
+//         {
+//           model: 'nova-3',
+//           language: 'en',
+//           smart_format: true,
+//         }
+//       );
+//       if (error) throw error;
+//       const userText = result.results.channels[0].alternatives[0].transcript;
+//       const fullContent = [
+//         { role: 'user', parts: [{ text: systemPrompt }] },                        //Gemini    Integration
+//         { role: 'user', parts: [{ text: userText }] }
+//       ];
+//       const response = await model.generateContent({ contents: fullContent });
+//       const botReply = response.response.text();
+//       const ttsResponse = await deepgram.speak.request(                           //(TTS)    Integration
+//         { text: botReply },
+//         { model: 'aura-asteria-en' }
+//       );
+//       // Stream TTS audio back to client
+//       res.set('Content-Type', 'audio/mpeg');
+//       const stream = await ttsResponse.getStream();
+//       Readable.from(stream).pipe(res);
+//     } catch (err) {
+//       console.error(err);
+//       res.status(500).json({ error: 'Internal Server Error' });
+//     }
+//   });
+// //
 exports.userRouter.post("/createPost", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { name, title, Description, Amount, Mobile } = req.body;
     const resp = yield pclient.fundingPost.create({

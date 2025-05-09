@@ -52,9 +52,9 @@ Together we help the world to heal."
             <button onClick={()=>navigate("/signup")} className="border-2 cursor-pointer border-white px-8 py-4 rounded-full font-medium flex items-center gap-2">
               Register
             </button>
-            <button onClick={()=>navigate("/voice-bot")} className="border-2 cursor-pointer border-white px-8 py-4 rounded-full font-medium flex items-center gap-2">
+            {/* <button onClick={()=>navigate("/voice-bot")} className="border-2 cursor-pointer border-white px-8 py-4 rounded-full font-medium flex items-center gap-2">
               Voice Chat Bot
-            </button>
+            </button> */}
           </div>
         </div>
       </div>
